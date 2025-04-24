@@ -1,0 +1,63 @@
+/*
+ * Copyright 2025 Thosea (https://github.com/imthosea)
+ *
+ * Licensed under the Pizzache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You should have been given a copy of the pizza license.
+ * If not, you may obtain a copy of the License at
+ *
+ *     https://raw.githubusercontent.com/imthosea/licenses/refs/heads/master/Pizzache2.0.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package me.thosea.autopoller.listener;
+
+import lombok.extern.log4j.Log4j2;
+import me.thosea.autopoller.command.CommandHandler;
+import me.thosea.autopoller.main.AutoPoller;
+import me.thosea.autopoller.util.ErrorReporter;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
+@Log4j2
+public final class CommandListener extends ListenerAdapter {
+	private final AutoPoller bot;
+
+	public CommandListener(AutoPoller bot) {
+		this.bot = bot;
+	}
+
+	@Override
+	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+		if(!bot.isOurGuild(event.getGuild())) return;
+		if(CommandHandler.IS_ERROR) {
+			event.reply("A configuration error occurred and command handlers failed to load. Please contact an admin.")
+					.setEphemeral(true)
+					.queue();
+			return;
+		}
+
+		Member member = event.getMember();
+		if(member == null) return;
+
+		String command = event.getName();
+		CommandHandler handler = CommandHandler.COMMANDS.get(command);
+		LOGGER.debug("@{} used command /{}, handler: {}",
+				() -> member.getUser().getName(),
+				() -> command,
+				() -> handler);
+
+		if(handler != null) {
+			try {
+				handler.handle(member, event.getInteraction());
+			} catch(Exception e) {
+				ErrorReporter.error(member, event, "command /" + command, e);
+			}
+		}
+	}
+}

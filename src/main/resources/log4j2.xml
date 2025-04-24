@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="[%d{HH:mm:ss}] [%c{0}/%level]: %msg%n"/>
+		</Console>
+		<!--		<RollingRandomAccessFile name="File" fileName="logs/latest.log" filePattern="logs/%i.log.gz">-->
+		<!--			<PatternLayout pattern="[%d{HH:mm:ss}] [%c{0}/%level]: %msg%n"/>-->
+		<!--			<DefaultRolloverStrategy max="6" fileIndex="min"/>-->
+		<!--			<Policies>-->
+		<!--				<OnStartupTriggeringPolicy/>-->
+		<!--				<SizeBasedTriggeringPolicy size="1GB"/>-->
+		<!--			</Policies>-->
+		<!--		</RollingRandomAccessFile>-->
+	</Appenders>
+	<Loggers>
+		<Root level="info">
+			<AppenderRef ref="Console"/>
+			<!--			<AppenderRef ref="File"/>-->
+		</Root>
+	</Loggers>
+</Configuration>
