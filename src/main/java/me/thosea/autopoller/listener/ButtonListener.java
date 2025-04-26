@@ -30,7 +30,7 @@ public final class ButtonListener extends ListenerAdapter {
 
 	public ButtonListener(AutoPoller bot) {
 		this.bot = bot;
-		//noinspection ResultOfMethodCallIgnored - possibly log error
+		// noinspection ResultOfMethodCallIgnored - handle error quickly
 		ButtonHandler.BUTTONS.isEmpty();
 	}
 
@@ -41,6 +41,7 @@ public final class ButtonListener extends ListenerAdapter {
 			event.reply("A configuration error occurred and button handlers failed to load. Please contact an admin.")
 					.setEphemeral(true)
 					.queue();
+			LOGGER.warn("Rejected @{}'s button click because there was an error", event.getUser().getName());
 			return;
 		}
 

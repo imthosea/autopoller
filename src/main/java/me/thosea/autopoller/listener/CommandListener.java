@@ -39,6 +39,7 @@ public final class CommandListener extends ListenerAdapter {
 			event.reply("A configuration error occurred and command handlers failed to load. Please contact an admin.")
 					.setEphemeral(true)
 					.queue();
+			LOGGER.warn("Rejected @{}'s command because there was an error", event.getUser().getName());
 			return;
 		}
 
