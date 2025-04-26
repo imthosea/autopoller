@@ -61,6 +61,9 @@ public final class AutopollerConfig {
 
 		this.pollChannelId = num(prop, "poll_channel_id");
 		this.pollLengthHours = num(prop, "poll_length_hours");
+		if(pollLengthHours < 1) {
+			throw new IllegalStateException("Poll length cannot be below one hour");
+		}
 
 		this.jdbcPath = "jdbc:sqlite:" + str(prop, "db_path");
 
