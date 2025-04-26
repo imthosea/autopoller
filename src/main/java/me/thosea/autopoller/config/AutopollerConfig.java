@@ -32,12 +32,12 @@ public final class AutopollerConfig {
 
 	public final long ticketsCategoryId;
 	public final long archivedTicketsCategoryId;
+	public final long ticketViewerRoleId;
 
 	public final long pollChannelId;
 	public final long pollLengthHours;
 
 	public final String jdbcPath;
-
 	public final boolean sqlDebugEnabled;
 
 	public final long cooldownSeconds;
@@ -58,6 +58,7 @@ public final class AutopollerConfig {
 
 		this.ticketsCategoryId = num(prop, "tickets_category_id");
 		this.archivedTicketsCategoryId = num(prop, "archived_tickets_category_id");
+		this.ticketViewerRoleId = num(prop, "ticket_viewer_role_id");
 
 		this.pollChannelId = num(prop, "poll_channel_id");
 		this.pollLengthHours = num(prop, "poll_length_hours");
@@ -66,7 +67,6 @@ public final class AutopollerConfig {
 		}
 
 		this.jdbcPath = "jdbc:sqlite:" + str(prop, "db_path");
-
 		Configurator.setRootLevel(level(prop, "logger.level_root"));
 		Configurator.setLevel("me.thosea.autopoller", level(prop, "logger.level_autopoller"));
 		this.sqlDebugEnabled = bool(prop, "db_debug_enabled");

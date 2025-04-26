@@ -30,7 +30,6 @@ public final class AutopollerMessages {
 
 	public final String about;
 
-	public final String makeAppMissingChannels;
 	public final String makeAppCooldown;
 	public final String makeAppTicketEmbedDesc;
 	public final String makeAppTicketEmbedColor;
@@ -80,7 +79,6 @@ public final class AutopollerMessages {
 
 		this.about = str(prop, "msg.about");
 
-		this.makeAppMissingChannels = str(prop, "msg.make_app.missing_channels");
 		this.makeAppCooldown = str(prop, "msg.make_app.cooldown");
 		this.makeAppTicketEmbedDesc = str(prop, "msg.make_app.ticket_embed.desc");
 		this.makeAppTicketEmbedColor = str(prop, "msg.make_app.ticket_embed.color");

@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.MentionType;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
@@ -41,8 +42,16 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("DataFlowIssue")
 @Log4j2
 public final class MakeAppButton extends DeferredButtonHandler {
-	private final Category category = BOT.guild.getCategoryById(BOT.config.ticketsCategoryId);
-	private final TextChannel pollChannel = BOT.guild.getTextChannelById(BOT.config.pollChannelId);
+	private final Category category = BOT.getOrThrow("tickets category", () -> {
+		return BOT.guild.getCategoryById(BOT.config.ticketsCategoryId);
+	});
+	private final TextChannel pollChannel = BOT.getOrThrow("poll channel", () -> {
+		return BOT.guild.getTextChannelById(BOT.config.pollChannelId);
+	});
+
+	private final Role ticketViewerRoleId = BOT.getOrThrow("ticket viewer role", () -> {
+		return BOT.guild.getRoleById(BOT.config.ticketViewerRoleId);
+	});
 
 	private final Emoji emojiOpt1 = Emoji.fromUnicode(MSG.makeAppPollOpt1Emoji);
 	private final Emoji emojiOpt2 = Emoji.fromUnicode(MSG.makeAppPollOpt2Emoji);
@@ -56,11 +65,6 @@ public final class MakeAppButton extends DeferredButtonHandler {
 
 	@Override
 	protected boolean preDefer(Member member, ButtonInteraction event) {
-		if(category == null || pollChannel == null) {
-			LOGGER.error("Required channel or category is missing! Failed.");
-			event.reply(MSG.makeAppMissingChannels).setEphemeral(true).queue();
-			return false;
-		}
 		return true;
 	}
 
@@ -90,32 +94,18 @@ public final class MakeAppButton extends DeferredButtonHandler {
 		hook.editOriginal(MSG.makeAppSuccess.formatted(ticket.getAsMention())).queue();
 	}
 
+	private static final List<Permission> ALLOW_PERMISSIONS = List.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY);
+	private static final List<Permission> DENY_PERMISSIONS = List.of(Permission.VIEW_CHANNEL);
+
 	private TextChannel makeTicket(Member member, String userMention,
 	                               int count, String countStr) {
 		TextChannel ticket = BOT.guild.createTextChannel(
 						member.getUser().getName() + "-application-" + count,
 						category)
-				.addMemberPermissionOverride(
-						member.getIdLong(),
-						// allow
-						List.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY),
-						// deny
-						null
-				)
-				.addPermissionOverride(
-						BOT.guild.getBotRole(),
-						// allow
-						List.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND),
-						// deny
-						null
-				)
-				.addPermissionOverride(
-						BOT.guild.getPublicRole(),
-						// allow
-						null,
-						// deny
-						List.of(Permission.VIEW_CHANNEL)
-				)
+				.addMemberPermissionOverride(member.getIdLong(), ALLOW_PERMISSIONS, null)
+				.addPermissionOverride(BOT.guild.getBotRole(), ALLOW_PERMISSIONS, null)
+				.addPermissionOverride(ticketViewerRoleId, ALLOW_PERMISSIONS, null)
+				.addPermissionOverride(BOT.guild.getPublicRole(), null, DENY_PERMISSIONS)
 				.complete();
 
 		ticket.sendMessageEmbeds(new EmbedBuilder()
