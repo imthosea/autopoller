@@ -40,5 +40,5 @@ bin/
 
 logs/
 # my bot token is there
-autopoller.properties
-autopoller_data.db
+/autopoller.properties
+/autopoller_data.db
