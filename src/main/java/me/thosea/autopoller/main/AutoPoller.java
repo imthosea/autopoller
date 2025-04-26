@@ -25,9 +25,11 @@ import me.thosea.autopoller.listener.ButtonListener;
 import me.thosea.autopoller.listener.CommandListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Supplier;
 
 @Log4j2
 public final class AutoPoller {
@@ -83,6 +85,14 @@ public final class AutoPoller {
 
 	public boolean isOurGuild(Guild guild) {
 		return guild != null && guild.getIdLong() == config.guildId;
+	}
+
+	@NotNull
+	public <T> T getOrThrow(String name, Supplier<T> getter) {
+		T thing = getter.get();
+		if(thing == null)
+			throw new IllegalStateException("Missing " + name);
+		return thing;
 	}
 
 	public static AutoPoller instance() {

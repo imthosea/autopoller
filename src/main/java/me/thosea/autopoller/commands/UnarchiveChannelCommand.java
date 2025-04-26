@@ -33,7 +33,9 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import java.util.List;
 
 public final class UnarchiveChannelCommand extends DeferredCommandHandler {
-	private final Category targetCategory = BOT.guild.getCategoryById(CONFIG.ticketsCategoryId);
+	private final Category targetCategory = BOT.getOrThrow("ticket category", () -> {
+		return BOT.guild.getCategoryById(CONFIG.ticketsCategoryId);
+	});
 
 	public UnarchiveChannelCommand() {
 		super(/*isEphemeral=*/ false, /*useVirtualThread=*/false);
@@ -48,9 +50,6 @@ public final class UnarchiveChannelCommand extends DeferredCommandHandler {
 	protected boolean preDefer(Member member, SlashCommandInteraction event) {
 		if(!member.hasPermission(Permission.MANAGE_THREADS)) {
 			event.reply(MSG.noPermission).setEphemeral(true).queue();
-			return false;
-		} else if(targetCategory == null) {
-			event.reply(MSG.archiveCmnMissingCategory).queue();
 			return false;
 		}
 

@@ -48,7 +48,6 @@ public final class AutopollerMessages {
 
 	public final String archiveCmnNotTicket;
 	public final String archiveCmnChannelMoved;
-	public final String archiveCmnMissingCategory;
 
 	public final String archiveAlreadyArchived;
 	public final String archiveSuccess;
@@ -99,7 +98,6 @@ public final class AutopollerMessages {
 
 		this.archiveCmnNotTicket = str(prop, "msg.archive_common.not_ticket");
 		this.archiveCmnChannelMoved = str(prop, "msg.archive_common.channel_moved");
-		this.archiveCmnMissingCategory = str(prop, "msg.archive_common.missing_category");
 
 		this.archiveAlreadyArchived = str(prop, "msg.archive_channel.already_archived");
 		this.archiveSuccess = str(prop, "msg.archive_channel.success");
