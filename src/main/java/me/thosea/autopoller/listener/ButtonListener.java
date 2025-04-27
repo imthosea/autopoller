@@ -21,6 +21,7 @@ import me.thosea.autopoller.button.ButtonHandler;
 import me.thosea.autopoller.main.AutoPoller;
 import me.thosea.autopoller.util.ErrorReporter;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -47,19 +48,17 @@ public final class ButtonListener extends ListenerAdapter {
 
 		Member member = event.getMember();
 		if(member == null) return;
+		User user = event.getUser();
 
 		String id = event.getComponentId();
 		ButtonHandler handler = ButtonHandler.BUTTONS.get(id);
-		LOGGER.debug("@{} clicked button {}, handler: {}",
-				() -> member.getUser().getName(),
-				() -> id,
-				() -> handler);
+		LOGGER.debug("@{} clicked button {}, handler: {}", user.getName(), id, handler);
 
 		if(handler != null) {
 			try {
-				handler.handle(member, event);
+				handler.handle(member, user, event);
 			} catch(Exception e) {
-				ErrorReporter.error(member, event, "button " + id, e);
+				ErrorReporter.error(user, event, "button " + id, e);
 			}
 		}
 	}

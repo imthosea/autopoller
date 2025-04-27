@@ -45,9 +45,9 @@ public final class RemoveCooldownCommand extends DeferredCommandHandler {
 	}
 
 	@Override
-	protected boolean preDefer(Member member, SlashCommandInteraction event) {
+	protected boolean preDefer(Member member, User user, SlashCommandInteraction event) {
 		if(!member.hasPermission(Permission.MANAGE_THREADS)) {
-			LOGGER.trace("No permission: {}", () -> member.getUser().getName());
+			LOGGER.trace("No permission: {}", user.getName());
 			event.reply(MSG.noPermission).setEphemeral(true).queue();
 			return false;
 		}
@@ -55,7 +55,7 @@ public final class RemoveCooldownCommand extends DeferredCommandHandler {
 	}
 
 	@Override
-	protected void handleDeferred(Member member, CommandInteractionPayload cmd, InteractionHook hook) {
+	protected void handleDeferred(Member member, User user, CommandInteractionPayload cmd, InteractionHook hook) {
 		User target = cmd.getOption("target", OptionMapping::getAsUser);
 		assert target != null; // arg is required
 
@@ -63,7 +63,7 @@ public final class RemoveCooldownCommand extends DeferredCommandHandler {
 			hook.editOriginal(MSG.removeCooldownSuccess.formatted(target.getAsMention()))
 					.setAllowedMentions(List.of())
 					.queue();
-			LOGGER.info("@{} removed @{}'s application delay", member.getUser().getName(), target.getName());
+			LOGGER.info("@{} removed @{}'s application delay", user.getName(), target.getName());
 		} else {
 			hook.editOriginal(MSG.removeCooldownNoCooldown.formatted(target.getAsMention()))
 					.setAllowedMentions(List.of())

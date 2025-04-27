@@ -27,6 +27,7 @@ import me.thosea.autopoller.config.AutopollerConfig;
 import me.thosea.autopoller.config.AutopollerMessages;
 import me.thosea.autopoller.main.AutoPoller;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
@@ -37,7 +38,7 @@ import java.util.Map;
 @Log4j2
 public abstract class CommandHandler {
 	protected abstract SlashCommandData makeCommandData();
-	public abstract void handle(Member member, SlashCommandInteraction event);
+	public abstract void handle(Member member, User user, SlashCommandInteraction event);
 
 	public static final Map<String, CommandHandler> COMMANDS;
 	public static final SlashCommandData[] DATA_ARRAY;

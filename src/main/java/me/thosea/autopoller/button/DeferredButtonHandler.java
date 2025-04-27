@@ -18,6 +18,7 @@ package me.thosea.autopoller.button;
 
 import me.thosea.autopoller.util.ErrorReporter;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 
@@ -33,27 +34,28 @@ public abstract class DeferredButtonHandler extends ButtonHandler {
 	}
 
 	@Override
-	public final void handle(Member member, ButtonInteraction event) {
-		if(!preDefer(member, event))
+	public final void handle(Member member, User user, ButtonInteraction event) {
+		if(!preDefer(member, user, event))
 			return;
 
 		String buttonId = event.getComponentId();
 		event.deferReply().setEphemeral(this.isEphemeral).queue(hook -> {
 			if(this.useVirtualThread) {
 				Thread.startVirtualThread(() -> {
-					callDeferredHandler(member, buttonId, hook);
+					callDeferredHandler(member, user, buttonId, hook);
 				});
 			} else {
-				callDeferredHandler(member, buttonId, hook);
+				callDeferredHandler(member, user, buttonId, hook);
 			}
 		});
 	}
 
-	private void callDeferredHandler(Member member, String buttonId, InteractionHook hook) {
+	private void callDeferredHandler(Member member, User user,
+	                                 String buttonId, InteractionHook hook) {
 		try {
-			this.handleDeferred(member, hook);
+			this.handleDeferred(member, user, hook);
 		} catch(Exception e) {
-			ErrorReporter.deferredError(member, hook, "button " + buttonId, e);
+			ErrorReporter.deferredError(user, hook, "button " + buttonId, e);
 		}
 	}
 
@@ -62,6 +64,6 @@ public abstract class DeferredButtonHandler extends ButtonHandler {
 		return "DeferredButtonHandler[class=" + getClass().getSimpleName() + "]";
 	}
 
-	protected abstract boolean preDefer(Member member, ButtonInteraction event);
-	protected abstract void handleDeferred(Member member, InteractionHook hook);
+	protected abstract boolean preDefer(Member member, User user, ButtonInteraction event);
+	protected abstract void handleDeferred(Member member, User user, InteractionHook hook);
 }

@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.MentionType;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
@@ -64,32 +65,32 @@ public final class MakeAppButton extends DeferredButtonHandler {
 	}
 
 	@Override
-	protected boolean preDefer(Member member, ButtonInteraction event) {
+	protected boolean preDefer(Member member, User user, ButtonInteraction event) {
 		return true;
 	}
 
 	@Override
-	protected void handleDeferred(Member member, InteractionHook hook) {
-		if(!UserDelays.addDelay(member.getIdLong())) {
-			LOGGER.trace("On cooldown: {}", () -> member.getUser().getName());
+	protected void handleDeferred(Member member, User user, InteractionHook hook) {
+		if(!UserDelays.addDelay(user.getIdLong())) {
+			LOGGER.trace("On cooldown: {}", user.getName());
 			hook.editOriginal(MSG.makeAppCooldown).queue();
 			return;
 		}
 
-		int count = ApplicationLogs.getAppCount(member.getIdLong()) + 1;
+		int count = ApplicationLogs.getAppCount(user.getIdLong()) + 1;
 		String countStr = FormatUtils.withEnglishSuffix(count);
 
-		LOGGER.info("@{} is making their {} application", member.getUser().getName(), countStr);
+		LOGGER.info("@{} is making their {} application", user.getName(), countStr);
 
-		String userMention = member.getAsMention();
-		TextChannel ticket = makeTicket(member, userMention, count, countStr);
-		Message pollMessage = sendPoll(member, userMention, countStr, ticket.getAsMention());
+		String userMention = user.getAsMention();
+		TextChannel ticket = makeTicket(user, userMention, count, countStr);
+		Message pollMessage = sendPoll(user, userMention, countStr, ticket.getAsMention());
 
 		String url = pollMessage.getJumpUrl();
 		LOGGER.debug(
 				"\nUser ID: {}\nTicket Channel ID: {}\nPoll Message URL: {}",
-				member.getIdLong(), ticket.getIdLong(), url);
-		ApplicationLogs.addLog(member.getIdLong(), ticket.getIdLong(), url);
+				user.getIdLong(), ticket.getIdLong(), url);
+		ApplicationLogs.addLog(user.getIdLong(), ticket.getIdLong(), url);
 
 		hook.editOriginal(MSG.makeAppSuccess.formatted(ticket.getAsMention())).queue();
 	}
@@ -97,12 +98,12 @@ public final class MakeAppButton extends DeferredButtonHandler {
 	private static final List<Permission> ALLOW_PERMISSIONS = List.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY);
 	private static final List<Permission> DENY_PERMISSIONS = List.of(Permission.VIEW_CHANNEL);
 
-	private TextChannel makeTicket(Member member, String userMention,
+	private TextChannel makeTicket(User user, String userMention,
 	                               int count, String countStr) {
 		TextChannel ticket = BOT.guild.createTextChannel(
-						member.getUser().getName() + "-application-" + count,
+						user.getName() + "-application-" + count,
 						category)
-				.addMemberPermissionOverride(member.getIdLong(), ALLOW_PERMISSIONS, null)
+				.addMemberPermissionOverride(user.getIdLong(), ALLOW_PERMISSIONS, null)
 				.addPermissionOverride(BOT.guild.getBotRole(), ALLOW_PERMISSIONS, null)
 				.addPermissionOverride(ticketViewerRoleId, ALLOW_PERMISSIONS, null)
 				.addPermissionOverride(BOT.guild.getPublicRole(), null, DENY_PERMISSIONS)
@@ -117,7 +118,7 @@ public final class MakeAppButton extends DeferredButtonHandler {
 		return ticket;
 	}
 
-	private Message sendPoll(Member member, String userMention,
+	private Message sendPoll(User user, String userMention,
 	                         String countStr, String ticketMention) {
 		String text = MSG.makeAppPollMessage.formatted(userMention, countStr, ticketMention);
 		Message msg = pollChannel.sendMessage(text)
@@ -129,7 +130,7 @@ public final class MakeAppButton extends DeferredButtonHandler {
 				.setAllowedMentions(List.of(MentionType.ROLE, MentionType.HERE, MentionType.EVERYONE))
 				.complete();
 
-		String threadName = MSG.makeAppPollThreadName.formatted(member.getUser().getName(), countStr);
+		String threadName = MSG.makeAppPollThreadName.formatted(user.getName(), countStr);
 		msg.createThreadChannel(threadName)
 				.setAutoArchiveDuration(AutoArchiveDuration.TIME_3_DAYS)
 				.queue();

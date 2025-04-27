@@ -21,6 +21,7 @@ import me.thosea.autopoller.util.ChannelUtils;
 import me.thosea.autopoller.util.ErrorReporter;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -47,7 +48,7 @@ public final class ArchiveChannelCommand extends DeferredCommandHandler {
 	}
 
 	@Override
-	protected boolean preDefer(Member member, SlashCommandInteraction event) {
+	protected boolean preDefer(Member member, User user, SlashCommandInteraction event) {
 		if(!member.hasPermission(Permission.MANAGE_THREADS)) {
 			event.reply(MSG.noPermission).setEphemeral(true).queue();
 			return false;
@@ -65,7 +66,7 @@ public final class ArchiveChannelCommand extends DeferredCommandHandler {
 	}
 
 	@Override
-	protected void handleDeferred(Member member, CommandInteractionPayload cmd, InteractionHook hook) {
+	protected void handleDeferred(Member member, User user, CommandInteractionPayload cmd, InteractionHook hook) {
 		var channel = (GuildMessageChannel) hook.getInteraction().getGuildChannel();
 		if(ChannelUtils.getCategoryId(channel) != CONFIG.ticketsCategoryId) {
 			hook.editOriginal(MSG.archiveCmnChannelMoved).queue();
@@ -74,11 +75,11 @@ public final class ArchiveChannelCommand extends DeferredCommandHandler {
 
 		((ICategorizableChannel) channel).getManager().setParent(targetCategory).queue(
 				_ -> {
-					hook.editOriginal(MSG.archiveSuccess.formatted(member.getAsMention()))
+					hook.editOriginal(MSG.archiveSuccess.formatted(user.getAsMention()))
 							.setAllowedMentions(List.of())
 							.queue();
 				},
-				e -> ErrorReporter.deferredError(member, hook, "channel archive", e)
+				e -> ErrorReporter.deferredError(user, hook, "channel archive", e)
 		);
 	}
 }

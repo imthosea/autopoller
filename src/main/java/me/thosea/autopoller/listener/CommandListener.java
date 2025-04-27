@@ -21,6 +21,7 @@ import me.thosea.autopoller.command.CommandHandler;
 import me.thosea.autopoller.main.AutoPoller;
 import me.thosea.autopoller.util.ErrorReporter;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -45,19 +46,17 @@ public final class CommandListener extends ListenerAdapter {
 
 		Member member = event.getMember();
 		if(member == null) return;
+		User user = event.getUser();
 
 		String command = event.getName();
 		CommandHandler handler = CommandHandler.COMMANDS.get(command);
-		LOGGER.debug("@{} used command /{}, handler: {}",
-				() -> member.getUser().getName(),
-				() -> command,
-				() -> handler);
+		LOGGER.debug("@{} used command /{}, handler: {}", user.getName(), command, handler);
 
 		if(handler != null) {
 			try {
-				handler.handle(member, event.getInteraction());
+				handler.handle(member, user, event.getInteraction());
 			} catch(Exception e) {
-				ErrorReporter.error(member, event, "command /" + command, e);
+				ErrorReporter.error(user, event, "command /" + command, e);
 			}
 		}
 	}

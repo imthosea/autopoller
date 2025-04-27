@@ -18,6 +18,7 @@ package me.thosea.autopoller.commands;
 
 import me.thosea.autopoller.command.CommandHandler;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -31,7 +32,7 @@ public final class AboutCommand extends CommandHandler {
 	}
 
 	@Override
-	public void handle(Member member, SlashCommandInteraction event) {
+	public void handle(Member member, User user, SlashCommandInteraction event) {
 		event.reply(MSG.about)
 				.setEphemeral(true)
 				.setAllowedMentions(List.of())

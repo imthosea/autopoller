@@ -48,9 +48,9 @@ public class ListApplicationsCommand extends DeferredCommandHandler {
 	}
 
 	@Override
-	protected boolean preDefer(Member member, SlashCommandInteraction event) {
+	protected boolean preDefer(Member member, User user, SlashCommandInteraction event) {
 		if(!member.hasPermission(Permission.MANAGE_THREADS)) {
-			LOGGER.trace("@{}: no permission", () -> member.getUser().getName());
+			LOGGER.trace("@{}: no permission", user.getName());
 			event.reply(MSG.noPermission).setEphemeral(true).queue();
 			return false;
 		}
@@ -58,11 +58,11 @@ public class ListApplicationsCommand extends DeferredCommandHandler {
 	}
 
 	@Override
-	protected void handleDeferred(Member member, CommandInteractionPayload cmd, InteractionHook hook) {
+	protected void handleDeferred(Member member, User user, CommandInteractionPayload cmd, InteractionHook hook) {
 		User target = cmd.getOption("target", OptionMapping::getAsUser);
 		assert target != null; // arg is required
 
-		LOGGER.debug("@{} is listing for @{}", () -> member.getUser().getName(), target::getName);
+		LOGGER.debug("@{} is listing for @{}", user.getName(), target.getName());
 
 		EmbedBuilder embed = new EmbedBuilder();
 		StringBuilder builder = new StringBuilder();

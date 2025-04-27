@@ -18,6 +18,7 @@ package me.thosea.autopoller.command;
 
 import me.thosea.autopoller.util.ErrorReporter;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
@@ -32,28 +33,29 @@ public abstract class DeferredCommandHandler extends CommandHandler {
 	}
 
 	@Override
-	public final void handle(Member member, SlashCommandInteraction event) {
-		if(!preDefer(member, event))
+	public final void handle(Member member, User user, SlashCommandInteraction event) {
+		if(!preDefer(member, user, event))
 			return;
 
 		event.deferReply().setEphemeral(isEphemeral).queue(hook -> {
 			String commandName = event.getName();
 			if(useVirtualThread) {
 				Thread.startVirtualThread(() -> {
-					callDeferredHandler(member, event, commandName, hook);
+					callDeferredHandler(member, user, event, commandName, hook);
 				});
 			} else {
-				callDeferredHandler(member, event, commandName, hook);
+				callDeferredHandler(member, user, event, commandName, hook);
 			}
 		});
 	}
 
-	private void callDeferredHandler(Member member, CommandInteractionPayload cmd,
-	                                 String commandName, InteractionHook hook) {
+	private void callDeferredHandler(Member member, User user,
+	                                 CommandInteractionPayload cmd, String commandName,
+	                                 InteractionHook hook) {
 		try {
-			this.handleDeferred(member, cmd, hook);
+			this.handleDeferred(member, user, cmd, hook);
 		} catch(Exception e) {
-			ErrorReporter.deferredError(member, hook, "command " + commandName, e);
+			ErrorReporter.deferredError(user, hook, "command " + commandName, e);
 		}
 	}
 
@@ -62,6 +64,6 @@ public abstract class DeferredCommandHandler extends CommandHandler {
 		return "DeferredCommandHandler[class=" + getClass().getSimpleName() + "]";
 	}
 
-	protected abstract boolean preDefer(Member member, SlashCommandInteraction event);
-	protected abstract void handleDeferred(Member member, CommandInteractionPayload cmd, InteractionHook hook);
+	protected abstract boolean preDefer(Member member, User user, SlashCommandInteraction event);
+	protected abstract void handleDeferred(Member member, User user, CommandInteractionPayload cmd, InteractionHook hook);
 }

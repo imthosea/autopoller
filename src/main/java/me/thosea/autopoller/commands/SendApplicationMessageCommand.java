@@ -22,6 +22,7 @@ import me.thosea.autopoller.command.CommandHandler;
 import me.thosea.autopoller.util.ErrorReporter;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
@@ -39,26 +40,26 @@ public final class SendApplicationMessageCommand extends CommandHandler {
 	}
 
 	@Override
-	public void handle(Member member, SlashCommandInteraction event) {
+	public void handle(Member member, User user, SlashCommandInteraction event) {
 		if(!member.hasPermission(Permission.MANAGE_SERVER)) {
 			event.reply(MSG.noPermission).setEphemeral(true).queue();
 			return;
 		}
 
 		MessageChannelUnion channel = event.getChannel();
-		LOGGER.info("@{} sent application message to #{}", member.getUser().getName(), channel.getName());
+		LOGGER.info("@{} sent application message to #{}", user.getName(), channel.getName());
 
 		event.deferReply().setEphemeral(true).queue(hook -> {
-			handle(member, hook, channel);
+			handle(user, hook, channel);
 		});
 	}
 
-	private void handle(Member member, InteractionHook hook, MessageChannelUnion channel) {
+	private void handle(User user, InteractionHook hook, MessageChannelUnion channel) {
 		channel.sendMessage(MSG.application)
 				.addActionRow(Button.primary(ButtonIds.MAKE_APP, MSG.applicationButton))
 				.queue(
 						_ -> hook.editOriginal(MSG.applicationMsgSent).queue(),
-						e -> ErrorReporter.deferredError(member, hook, "application message sending", e)
+						e -> ErrorReporter.deferredError(user, hook, "application message sending", e)
 				);
 	}
 }

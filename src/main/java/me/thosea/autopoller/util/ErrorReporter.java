@@ -18,7 +18,7 @@ package me.thosea.autopoller.util;
 
 import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.main.AutoPoller;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
@@ -28,15 +28,15 @@ public final class ErrorReporter {
 
 	private static final String MSG = AutoPoller.instance().config.messages.error;
 
-	public static void error(Member member, IReplyCallback event,
+	public static void error(User user, IReplyCallback event,
 	                         String task, Throwable e) {
-		LOGGER.error("Error processing {} for @{}", task, member.getUser().getName(), e);
+		LOGGER.error("Error processing {} for @{}", task, user.getName(), e);
 		event.reply(MSG).setEphemeral(true).queue();
 	}
 
-	public static void deferredError(Member member, InteractionHook hook,
+	public static void deferredError(User user, InteractionHook hook,
 	                                 String task, Throwable e) {
-		LOGGER.error("Error processing deferred {} for @{}", task, member.getUser().getName(), e);
+		LOGGER.error("Error processing deferred {} for @{}", task, user.getName(), e);
 		hook.editOriginal(MSG).queue();
 	}
 }

@@ -22,13 +22,14 @@ import me.thosea.autopoller.config.AutopollerConfig;
 import me.thosea.autopoller.config.AutopollerMessages;
 import me.thosea.autopoller.main.AutoPoller;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 
 import java.util.Map;
 
 @Log4j2
 public abstract class ButtonHandler {
-	public abstract void handle(Member member, ButtonInteraction event);
+	public abstract void handle(Member member, User user, ButtonInteraction event);
 
 	protected static final AutoPoller BOT = AutoPoller.instance();
 	protected static final AutopollerConfig CONFIG = BOT.config;
