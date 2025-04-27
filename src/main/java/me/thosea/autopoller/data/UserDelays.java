@@ -43,10 +43,10 @@ public final class UserDelays {
 
 	public static void cleanup() {
 		try(SqlHelper sql = new SqlHelper()) {
-			int result = sql.update("DELETE FROM UserDelays WHERE (time <= unixepoch() - ?)", smt -> {
+			int rows = sql.update("DELETE FROM UserDelays WHERE (time <= unixepoch() - ?)", smt -> {
 				smt.setLong(1, CONFIG.cooldownSeconds);
 			});
-			LOGGER.info("Cleaned up {} rows", result);
+			LOGGER.info("Cleaned up {} rows", rows);
 		} catch(SQLException e) {
 			throw new RuntimeException("Error doign SQL cleanup", e);
 		}

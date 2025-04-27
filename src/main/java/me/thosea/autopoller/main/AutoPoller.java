@@ -20,9 +20,11 @@ import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.command.CommandHandler;
 import me.thosea.autopoller.config.AutopollerConfig;
 import me.thosea.autopoller.data.ApplicationLogs;
+import me.thosea.autopoller.data.TrackedPolls;
 import me.thosea.autopoller.data.UserDelays;
 import me.thosea.autopoller.listener.ButtonListener;
 import me.thosea.autopoller.listener.CommandListener;
+import me.thosea.autopoller.listener.PollEndListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
@@ -57,34 +59,55 @@ public final class AutoPoller {
 
 		UserDelays.init();
 		ApplicationLogs.init();
-		scheduleDelayCleanup();
+		TrackedPolls.init();
+		scheduleSqlCleanup();
 
 		jda.addEventListener(
-				new CommandListener(this),
-				new ButtonListener(this)
+				new CommandListener(),
+				new ButtonListener(),
+				new PollEndListener()
 		);
 		if(!CommandHandler.IS_ERROR) {
 			jda.updateCommands().addCommands(CommandHandler.DATA_ARRAY).queue();
 		}
 	}
 
-	private void scheduleDelayCleanup() {
+	private void scheduleSqlCleanup() {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				LOGGER.info("Running user delay cleanup");
-				UserDelays.cleanup();
+				LOGGER.info("Running SQL cleanup");
+
+				try {
+					UserDelays.cleanup();
+				} catch(Exception e) {
+					LOGGER.error("Error doing user delay cleanup", e);
+				}
+				try {
+					TrackedPolls.cleanup();
+				} catch(Exception e) {
+					LOGGER.error("Error doing tracked polls cleanup", e);
+				}
 			}
 		};
 
-		Timer timer = new Timer("User delay cleanup", true);
-		long period = Math.max(config.cooldownSeconds * 1000 + 1, 24 * 60 * 60 * 1000);
-		timer.schedule(task, 0, period);
-		LOGGER.info("User delay cleanup period: {} ms", period);
+		Timer timer = new Timer("SQL cleanup", true);
+		long delayPeriodMs = config.cooldownSeconds * 1000 + 1;
+		long pollPeriodMs = config.pollLengthHours * 60 * 60 * 1000 + 1;
+		// since polls have to be at least an hour long,
+		// the period will always be > 1h
+		long periodMs = Math.max(delayPeriodMs, pollPeriodMs);
+
+		timer.schedule(task, 0, periodMs);
+		LOGGER.info("SQL cleanup period: {} ms", periodMs);
 	}
 
 	public boolean isOurGuild(Guild guild) {
 		return guild != null && guild.getIdLong() == config.guildId;
+	}
+
+	public boolean isOurGuild(long guildId) {
+		return guildId == config.guildId;
 	}
 
 	@NotNull

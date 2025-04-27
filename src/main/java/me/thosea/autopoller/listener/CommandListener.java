@@ -27,15 +27,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 @Log4j2
 public final class CommandListener extends ListenerAdapter {
-	private final AutoPoller bot;
-
-	public CommandListener(AutoPoller bot) {
-		this.bot = bot;
-	}
+	private static final AutoPoller BOT = AutoPoller.instance();
 
 	@Override
 	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-		if(!bot.isOurGuild(event.getGuild())) return;
+		if(!BOT.isOurGuild(event.getGuild())) return;
 		if(CommandHandler.IS_ERROR) {
 			event.reply("A configuration error occurred and command handlers failed to load. Please contact an admin.")
 					.setEphemeral(true)

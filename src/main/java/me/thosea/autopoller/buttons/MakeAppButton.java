@@ -19,8 +19,10 @@ package me.thosea.autopoller.buttons;
 import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.button.DeferredButtonHandler;
 import me.thosea.autopoller.data.ApplicationLogs;
+import me.thosea.autopoller.data.TrackedPolls;
 import me.thosea.autopoller.data.UserDelays;
 import me.thosea.autopoller.util.FormatUtils;
+import me.thosea.autopoller.util.RoleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -53,6 +55,9 @@ public final class MakeAppButton extends DeferredButtonHandler {
 	private final Role ticketViewerRoleId = BOT.getOrThrow("ticket viewer role", () -> {
 		return BOT.guild.getRoleById(BOT.config.ticketViewerRoleId);
 	});
+	private final Role winRole = BOT.getOrThrow("win role", () -> {
+		return BOT.guild.getRoleById(BOT.config.pollWinRoleId);
+	});
 
 	private final Emoji emojiOpt1 = Emoji.fromUnicode(MSG.makeAppPollOpt1Emoji);
 	private final Emoji emojiOpt2 = Emoji.fromUnicode(MSG.makeAppPollOpt2Emoji);
@@ -66,6 +71,13 @@ public final class MakeAppButton extends DeferredButtonHandler {
 
 	@Override
 	protected boolean preDefer(Member member, User user, ButtonInteraction event) {
+		if(RoleUtils.hasRole(member, winRole)) {
+			event.reply(MSG.makeAppHasRole.formatted(winRole.getAsMention()))
+					.setAllowedMentions(List.of())
+					.setEphemeral(true)
+					.queue();
+			return false;
+		}
 		return true;
 	}
 
@@ -73,7 +85,7 @@ public final class MakeAppButton extends DeferredButtonHandler {
 	protected void handleDeferred(Member member, User user, InteractionHook hook) {
 		if(!UserDelays.addDelay(user.getIdLong())) {
 			LOGGER.trace("On cooldown: {}", user.getName());
-			hook.editOriginal(MSG.makeAppCooldown).queue();
+			hook.editOriginal(MSG.makeAppCooldown).complete();
 			return;
 		}
 
@@ -82,17 +94,25 @@ public final class MakeAppButton extends DeferredButtonHandler {
 
 		LOGGER.info("@{} is making their {} application", user.getName(), countStr);
 
-		String userMention = user.getAsMention();
+		String userMention = member.getAsMention();
 		TextChannel ticket = makeTicket(user, userMention, count, countStr);
-		Message pollMessage = sendPoll(user, userMention, countStr, ticket.getAsMention());
+		Message pollMessage = sendPoll(userMention, countStr, ticket.getAsMention());
+		long pollThread = makePollThread(user, countStr, pollMessage);
 
 		String url = pollMessage.getJumpUrl();
 		LOGGER.debug(
 				"\nUser ID: {}\nTicket Channel ID: {}\nPoll Message URL: {}",
-				user.getIdLong(), ticket.getIdLong(), url);
-		ApplicationLogs.addLog(user.getIdLong(), ticket.getIdLong(), url);
+				member.getIdLong(), ticket.getIdLong(), url);
 
-		hook.editOriginal(MSG.makeAppSuccess.formatted(ticket.getAsMention())).queue();
+		ApplicationLogs.addLog(user.getIdLong(), ticket.getIdLong(), url);
+		TrackedPolls.trackPoll(
+				user.getIdLong(), user.getName(),
+				pollChannel.getIdLong(), pollMessage.getIdLong(),
+				ticket.getIdLong(), pollThread,
+				(System.currentTimeMillis() / 1000L) + (CONFIG.pollLengthHours * 60 * 60) + 30
+		);
+
+		hook.editOriginal(MSG.makeAppSuccess.formatted(ticket.getAsMention())).complete();
 	}
 
 	private static final List<Permission> ALLOW_PERMISSIONS = List.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY);
@@ -118,10 +138,9 @@ public final class MakeAppButton extends DeferredButtonHandler {
 		return ticket;
 	}
 
-	private Message sendPoll(User user, String userMention,
-	                         String countStr, String ticketMention) {
+	private Message sendPoll(String userMention, String countStr, String ticketMention) {
 		String text = MSG.makeAppPollMessage.formatted(userMention, countStr, ticketMention);
-		Message msg = pollChannel.sendMessage(text)
+		return pollChannel.sendMessage(text)
 				.setPoll(MessagePollData.builder(MSG.makeAppPoll)
 						.addAnswer(MSG.makeAppPollOpt1, emojiOpt1)
 						.addAnswer(MSG.makeAppPollOpt2, emojiOpt2)
@@ -129,11 +148,13 @@ public final class MakeAppButton extends DeferredButtonHandler {
 						.build())
 				.setAllowedMentions(List.of(MentionType.ROLE, MentionType.HERE, MentionType.EVERYONE))
 				.complete();
+	}
 
+	private long makePollThread(User user, String countStr, Message pollMessage) {
 		String threadName = MSG.makeAppPollThreadName.formatted(user.getName(), countStr);
-		msg.createThreadChannel(threadName)
+		return pollMessage.createThreadChannel(threadName)
 				.setAutoArchiveDuration(AutoArchiveDuration.TIME_3_DAYS)
-				.queue();
-		return msg;
+				.complete()
+				.getIdLong();
 	}
 }

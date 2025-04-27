@@ -27,17 +27,16 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 @Log4j2
 public final class ButtonListener extends ListenerAdapter {
-	private final AutoPoller bot;
+	private static final AutoPoller BOT = AutoPoller.instance();
 
-	public ButtonListener(AutoPoller bot) {
-		this.bot = bot;
+	public ButtonListener() {
 		// noinspection ResultOfMethodCallIgnored - handle error quickly
 		ButtonHandler.BUTTONS.isEmpty();
 	}
 
 	@Override
 	public void onButtonInteraction(ButtonInteractionEvent event) {
-		if(!bot.isOurGuild(event.getGuild())) return;
+		if(!BOT.isOurGuild(event.getGuild())) return;
 		if(ButtonHandler.IS_ERROR) {
 			event.reply("A configuration error occurred and button handlers failed to load. Please contact an admin.")
 					.setEphemeral(true)

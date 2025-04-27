@@ -62,12 +62,12 @@ public final class RemoveCooldownCommand extends DeferredCommandHandler {
 		if(UserDelays.removeDelay(target.getIdLong())) {
 			hook.editOriginal(MSG.removeCooldownSuccess.formatted(target.getAsMention()))
 					.setAllowedMentions(List.of())
-					.queue();
+					.complete();
 			LOGGER.info("@{} removed @{}'s application delay", user.getName(), target.getName());
 		} else {
 			hook.editOriginal(MSG.removeCooldownNoCooldown.formatted(target.getAsMention()))
 					.setAllowedMentions(List.of())
-					.queue();
+					.complete();
 		}
 	}
 }

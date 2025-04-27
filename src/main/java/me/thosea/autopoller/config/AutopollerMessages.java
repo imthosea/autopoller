@@ -30,6 +30,7 @@ public final class AutopollerMessages {
 
 	public final String about;
 
+	public final String makeAppHasRole;
 	public final String makeAppCooldown;
 	public final String makeAppTicketEmbedDesc;
 	public final String makeAppTicketEmbedColor;
@@ -41,6 +42,10 @@ public final class AutopollerMessages {
 	public final String makeAppPollOpt2Emoji;
 	public final String makeAppPollThreadName;
 	public final String makeAppSuccess;
+
+	public final String endPollWin;
+	public final String endPollLose;
+	public final String endPollAcknowledgeReactionEmoji;
 
 	public final String removeCooldownNoCooldown;
 	public final String removeCooldownSuccess;
@@ -60,6 +65,14 @@ public final class AutopollerMessages {
 	public final String listAppsDescLine;
 	public final String listAppsColor;
 
+	public final String endPollBadUrl;
+	public final String endPollNoResult;
+	public final String endPollNotMine;
+	public final String endPollNotPoll;
+	public final String endPollAlreadyEnded;
+	public final String endPollFailed;
+	public final String endPollSuccess;
+
 	public final String descSendApplicationMessage;
 	public final String descAbout;
 	public final String descRemoveCooldown;
@@ -68,6 +81,9 @@ public final class AutopollerMessages {
 	public final String descUnarchiveChannel;
 	public final String descListApplications;
 	public final String descListApplicationsArg;
+	public final String descEndPoll;
+	public final String descEndPollArg1;
+	public final String descEndPollArg2;
 
 	public AutopollerMessages(Properties prop) {
 		this.noPermission = str(prop, "msg.no_permission");
@@ -79,6 +95,7 @@ public final class AutopollerMessages {
 
 		this.about = str(prop, "msg.about");
 
+		this.makeAppHasRole = str(prop, "msg.make_app.has_role");
 		this.makeAppCooldown = str(prop, "msg.make_app.cooldown");
 		this.makeAppTicketEmbedDesc = str(prop, "msg.make_app.ticket_embed.desc");
 		this.makeAppTicketEmbedColor = str(prop, "msg.make_app.ticket_embed.color");
@@ -90,6 +107,10 @@ public final class AutopollerMessages {
 		this.makeAppPollOpt2Emoji = str(prop, "msg.make_app.poll.opt2_emoji");
 		this.makeAppPollThreadName = str(prop, "msg.make_app.poll_thread_name");
 		this.makeAppSuccess = str(prop, "msg.make_app.success");
+
+		this.endPollWin = str(prop, "msg.poll_end.win");
+		this.endPollLose = str(prop, "msg.poll_end.lose");
+		this.endPollAcknowledgeReactionEmoji = str(prop, "msg.poll_end.acknowledge_reaction_emoji");
 
 		this.removeCooldownNoCooldown = str(prop, "msg.remove_cooldown.no_cooldown");
 		this.removeCooldownSuccess = str(prop, "msg.remove_cooldown.success");
@@ -109,6 +130,14 @@ public final class AutopollerMessages {
 		this.listAppsDescLine = str(prop, "msg.list_applications.embed.desc_line");
 		this.listAppsColor = str(prop, "msg.list_applications.embed.color");
 
+		this.endPollBadUrl = str(prop, "msg.end_poll.bad_url");
+		this.endPollNoResult = str(prop, "msg.end_poll.no_result");
+		this.endPollNotMine = str(prop, "msg.end_poll.not_mine");
+		this.endPollNotPoll = str(prop, "msg.end_poll.not_poll");
+		this.endPollAlreadyEnded = str(prop, "msg.end_poll.already_ended");
+		this.endPollFailed = str(prop, "msg.end_poll.failed");
+		this.endPollSuccess = str(prop, "msg.end_poll.success");
+
 		this.descSendApplicationMessage = str(prop, "msg.desc.sendapplicationmessage");
 		this.descAbout = str(prop, "msg.desc.about");
 		this.descRemoveCooldown = str(prop, "msg.desc.removecooldown");
@@ -117,5 +146,8 @@ public final class AutopollerMessages {
 		this.descUnarchiveChannel = str(prop, "msg.desc.unarchivechannel");
 		this.descListApplications = str(prop, "msg.desc.listapplications");
 		this.descListApplicationsArg = str(prop, "msg.desc.listapplications.arg");
+		this.descEndPoll = str(prop, "msg.desc.endpoll");
+		this.descEndPollArg1 = str(prop, "msg.desc.endpoll.arg1");
+		this.descEndPollArg2 = str(prop, "msg.desc.endpoll.arg2");
 	}
 }

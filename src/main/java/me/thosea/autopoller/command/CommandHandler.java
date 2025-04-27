@@ -19,6 +19,7 @@ package me.thosea.autopoller.command;
 import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.commands.AboutCommand;
 import me.thosea.autopoller.commands.ArchiveChannelCommand;
+import me.thosea.autopoller.commands.EndPollCommand;
 import me.thosea.autopoller.commands.ListApplicationsCommand;
 import me.thosea.autopoller.commands.RemoveCooldownCommand;
 import me.thosea.autopoller.commands.SendApplicationMessageCommand;
@@ -61,7 +62,8 @@ public abstract class CommandHandler {
 					new RemoveCooldownCommand(),
 					new ArchiveChannelCommand(),
 					new UnarchiveChannelCommand(),
-					new ListApplicationsCommand()
+					new ListApplicationsCommand(),
+					new EndPollCommand()
 			);
 
 			dataArray = new SlashCommandData[handlers.size()];

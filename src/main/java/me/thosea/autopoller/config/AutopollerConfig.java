@@ -36,6 +36,8 @@ public final class AutopollerConfig {
 
 	public final long pollChannelId;
 	public final long pollLengthHours;
+	public final float pollWinPercent;
+	public final long pollWinRoleId;
 
 	public final String jdbcPath;
 	public final boolean sqlDebugEnabled;
@@ -62,9 +64,14 @@ public final class AutopollerConfig {
 
 		this.pollChannelId = num(prop, "poll_channel_id");
 		this.pollLengthHours = num(prop, "poll_length_hours");
-		if(pollLengthHours < 1) {
-			throw new IllegalStateException("Poll length cannot be below one hour");
+		if(pollLengthHours < 1 || pollLengthHours > 168) {
+			throw new IllegalStateException("Poll length cannot be below one hour or above one week");
 		}
+		this.pollWinPercent = decimal(prop, "poll_win_percent");
+		if(pollWinPercent < 0 || pollWinPercent > 100) {
+			throw new IllegalStateException("Poll win precent is not between 0 and 100");
+		}
+		this.pollWinRoleId = num(prop, "poll_win_role_id");
 
 		this.jdbcPath = "jdbc:sqlite:" + str(prop, "db_path");
 		Configurator.setRootLevel(level(prop, "logger.level_root"));
@@ -90,6 +97,14 @@ public final class AutopollerConfig {
 	public static long num(Properties prop, String key) {
 		try {
 			return Long.parseLong(str(prop, key));
+		} catch(NumberFormatException ignored) {
+			throw new IllegalArgumentException("Invalid number for config value " + key);
+		}
+	}
+
+	public static float decimal(Properties prop, String key) {
+		try {
+			return Float.parseFloat(str(prop, key));
 		} catch(NumberFormatException ignored) {
 			throw new IllegalArgumentException("Invalid number for config value " + key);
 		}

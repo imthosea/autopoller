@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import okhttp3.OkHttpClient;
 
 import java.io.IOException;
@@ -55,6 +56,7 @@ public final class Bootstrap {
 		// RestActionImpl.setDefaultFailure(error -> {}); // uncomment to hide exceptions
 
 		JDABuilder.createDefault(config.token)
+				.enableIntents(GatewayIntent.GUILD_MEMBERS)
 				.setStatus(OnlineStatus.ONLINE)
 				.addEventListeners(new ListenerAdapter() {
 					@Override

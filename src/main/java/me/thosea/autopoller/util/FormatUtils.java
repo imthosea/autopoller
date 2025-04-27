@@ -16,8 +16,13 @@
  */
 package me.thosea.autopoller.util;
 
+import me.thosea.autopoller.main.AutoPoller;
+import org.jetbrains.annotations.Nullable;
+
 public final class FormatUtils {
 	private FormatUtils() {}
+
+	private static final AutoPoller BOT = AutoPoller.instance();
 
 	public static String withEnglishSuffix(int num) {
 		if(num >= 11 && num <= 13)
@@ -29,4 +34,24 @@ public final class FormatUtils {
 			default -> "th";
 		};
 	}
+
+	@Nullable
+	public static ParseResult parseMessageUrl(String url) {
+		if(!url.startsWith("https://discord.com/channels/")) return null;
+
+		String[] split = url.split("/");
+		if(split.length < 7) return null;
+
+		try {
+			long guild = Long.parseLong(split[4]);
+			long channel = Long.parseLong(split[5]);
+			long msg = Long.parseLong(split[6]);
+			if(BOT.isOurGuild(guild)) {
+				return new ParseResult(channel, msg);
+			}
+		} catch(NumberFormatException ignored) {}
+		return null;
+	}
+
+	public record ParseResult(long channelId, long messageId) {}
 }
