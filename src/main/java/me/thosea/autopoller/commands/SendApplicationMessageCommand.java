@@ -18,20 +18,24 @@ package me.thosea.autopoller.commands;
 
 import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.button.ButtonIds;
-import me.thosea.autopoller.command.CommandHandler;
+import me.thosea.autopoller.command.DeferredCommandHandler;
 import me.thosea.autopoller.util.ErrorReporter;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 @Log4j2
-public final class SendApplicationMessageCommand extends CommandHandler {
+public final class SendApplicationMessageCommand extends DeferredCommandHandler {
+	public SendApplicationMessageCommand() {
+		super(/*isEphemeral=*/ true, /*useVirtualThread=*/false);
+	}
+
 	@Override
 	protected SlashCommandData makeCommandData() {
 		return Commands.slash(
@@ -40,22 +44,18 @@ public final class SendApplicationMessageCommand extends CommandHandler {
 	}
 
 	@Override
-	public void handle(Member member, User user, SlashCommandInteraction event) {
+	protected boolean preDefer(Member member, User user, SlashCommandInteraction event) {
 		if(!member.hasPermission(Permission.MANAGE_SERVER)) {
 			event.reply(MSG.noPermission).setEphemeral(true).queue();
-			return;
+			return false;
 		}
-
-		MessageChannelUnion channel = event.getChannel();
-		LOGGER.info("@{} sent application message to #{}", user.getName(), channel.getName());
-
-		event.deferReply().setEphemeral(true).queue(hook -> {
-			handle(user, hook, channel);
-		});
+		LOGGER.info("@{} sent application message to #{}", user.getName(), event.getChannel().getName());
+		return true;
 	}
 
-	private void handle(User user, InteractionHook hook, MessageChannelUnion channel) {
-		channel.sendMessage(MSG.application)
+	@Override
+	protected void handleDeferred(Member member, User user, CommandInteractionPayload cmd, InteractionHook hook) {
+		cmd.getMessageChannel().sendMessage(MSG.application)
 				.addActionRow(Button.primary(ButtonIds.MAKE_APP, MSG.applicationButton))
 				.queue(
 						_ -> hook.editOriginal(MSG.applicationMsgSent).queue(),
