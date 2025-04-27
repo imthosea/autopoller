@@ -92,7 +92,7 @@ public class ListApplicationsCommand extends DeferredCommandHandler {
 				builder.append(line);
 			} while(set.next());
 
-			embed.setTitle("Applications for @" + target.getName() + " (Total: " + rows + ")");
+			embed.setTitle(MSG.listAppsTitle.formatted(target.getName(), rows));
 		});
 
 		embed.setColor(embedColor);
