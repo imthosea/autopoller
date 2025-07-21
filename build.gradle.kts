@@ -44,7 +44,7 @@ java.toolchain {
 }
 
 tasks.jar {
-    archiveAppendix = "no-deps"
+    archiveClassifier = "no-deps"
 }
 
 tasks.shadowJar {
@@ -57,8 +57,8 @@ tasks.shadowJar {
 
     archiveClassifier = ""
 
-    val jar = tasks.jar.map { archiveFile.get().asFile }
-    doLast { jar.get().delete() }
+    val archiveFile = tasks.jar.get().archiveFile
+    doLast { archiveFile.get().asFile.delete() }
 }
 
 tasks.distZip { enabled = false }
