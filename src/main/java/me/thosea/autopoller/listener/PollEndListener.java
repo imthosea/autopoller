@@ -125,17 +125,17 @@ public final class PollEndListener extends ListenerAdapter {
 			}
 
 			BOT.guild.addRoleToMember(member, winRole).complete();
-			sendMessage(MSG.endPollWin, entry, thread);
+			sendMessage(MSG.endPollWin, entry, ticket);
 		} else {
-			sendMessage(MSG.endPollLose, entry, thread);
+			sendMessage(MSG.endPollLose, entry, ticket);
 		}
 
-		ticket.delete().complete();
+		thread.delete().complete();
 	}
 
-	private void sendMessage(String msg, TrackedPollEntry entry, ThreadChannel thread) {
+	private void sendMessage(String msg, TrackedPollEntry entry, TextChannel ticket) {
 		msg = msg.formatted(entry.applicantId(), winRole.getAsMention());
-		thread.sendMessage(msg)
+		ticket.sendMessage(msg)
 				.setAllowedMentions(Collections.singletonList(MentionType.USER))
 				.queue();
 	}
