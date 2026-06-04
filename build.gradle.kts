@@ -35,7 +35,7 @@ tasks.processResources {
     }
 
     from("LICENSE")
-    from("ThirdPartyLicenses")
+    from("ThirdPartyLicenses.txt")
     from("NOTICE")
 }
 
