@@ -1,64 +1,62 @@
 import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
 
 plugins {
-    java
-    application
-    id("io.freefair.lombok") version "8.13.1"
-    id("com.gradleup.shadow") version "9.0.0-rc1"
+	java
+	application
+	id("io.freefair.lombok") version "8.13.1"
+	id("com.gradleup.shadow") version "9.0.0-rc1"
 }
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
-    implementation("net.dv8tion:JDA:5.3.2") {
-        exclude(module = "opus-java") // audio library
-    }
-    implementation("com.zaxxer:HikariCP:6.3.0")
-    runtimeOnly("org.xerial:sqlite-jdbc:3.49.1.0")
+	implementation("net.dv8tion:JDA:5.3.2") {
+		exclude(module = "opus-java") // audio library
+	}
+	implementation("com.zaxxer:HikariCP:6.3.0")
+	runtimeOnly("org.xerial:sqlite-jdbc:3.49.1.0")
 
-    implementation("org.apache.logging.log4j:log4j-api:2.24.3")
-    implementation("org.apache.logging.log4j:log4j-core:2.24.3")
-    runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.3")
+	implementation("org.apache.logging.log4j:log4j-api:2.24.3")
+	implementation("org.apache.logging.log4j:log4j-core:2.24.3")
+	runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.3")
 }
 
 application {
-    mainClass = "me.thosea.autopoller.main.Bootstrap"
+	mainClass = "me.thosea.autopoller.main.Bootstrap"
 }
 
 tasks.processResources {
-    val properties = mapOf("version" to version)
-    inputs.properties(properties)
-    filesMatching("autopoller_version.txt") {
-        expand(properties)
-    }
+	val properties = mapOf("version" to version)
+	inputs.properties(properties)
+	filesMatching("autopoller_version.txt") {
+		expand(properties)
+	}
 
-    from("LICENSE")
-    from("ThirdPartyLicenses.txt")
-    from("NOTICE")
+	from("LICENSE")
+	from("ThirdPartyLicenses.txt")
+	from("NOTICE")
 }
 
 java.toolchain {
-    languageVersion = JavaLanguageVersion.of(25)
+	languageVersion = JavaLanguageVersion.of(25)
 }
 
-tasks.jar {
-    archiveClassifier = "no-deps"
-}
+tasks.jar { archiveClassifier = "no-deps" }
 
 tasks.shadowJar {
-    minimize {
-        exclude(dependency("org.apache.logging.log4j:.*:.*"))
-        exclude(dependency("org.xerial:sqlite-jdbc:.*"))
-    }
-    transform(Log4j2PluginsCacheFileTransformer())
-    mergeServiceFiles()
+	minimize {
+		exclude(dependency("org.apache.logging.log4j:.*:.*"))
+		exclude(dependency("org.xerial:sqlite-jdbc:.*"))
+	}
+	transform(Log4j2PluginsCacheFileTransformer())
+	mergeServiceFiles()
 
-    archiveClassifier = ""
+	archiveClassifier = ""
 
-    val archiveFile = tasks.jar.get().archiveFile
-    doLast { archiveFile.get().asFile.delete() }
+	val archiveFile = tasks.jar.get().archiveFile
+	doLast { archiveFile.get().asFile.delete() }
 }
 
 tasks.distZip { enabled = false }
