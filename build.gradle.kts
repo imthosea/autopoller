@@ -42,6 +42,11 @@ java.toolchain {
 	languageVersion = JavaLanguageVersion.of(25)
 }
 
+sourceSets.main {
+	java.setSrcDirs(listOf("src"))
+	resources.setSrcDirs(listOf("resources"))
+}
+
 tasks.jar { archiveClassifier = "no-deps" }
 
 tasks.shadowJar {
