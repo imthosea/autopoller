@@ -36,6 +36,8 @@ public final class AutopollerConfig {
 	public final long pollChannelId;
 	public final long pollLengthHours;
 	public final float pollWinPercent;
+	public final int pollEarlyWinCount;
+	public final long pollEarlyWinCheckInterval;
 	public final long pollWinRoleId;
 
 	public final String jdbcPath;
@@ -69,6 +71,11 @@ public final class AutopollerConfig {
 		this.pollWinPercent = decimal(prop, "poll_win_percent");
 		if(pollWinPercent < 0 || pollWinPercent > 100) {
 			throw new IllegalStateException("Poll win precent is not between 0 and 100");
+		}
+		this.pollEarlyWinCount = (int) num(prop, "poll_early_win_count");
+		this.pollEarlyWinCheckInterval = num(prop, "poll_early_win_check_interval");
+		if(pollEarlyWinCheckInterval >= pollLengthHours * 60) {
+			throw new IllegalStateException("Poll early win check interval cannot be above poll length");
 		}
 		this.pollWinRoleId = num(prop, "poll_win_role_id");
 

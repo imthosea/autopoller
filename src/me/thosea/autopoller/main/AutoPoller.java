@@ -23,6 +23,7 @@ import me.thosea.autopoller.data.UserDelays;
 import me.thosea.autopoller.listener.ButtonListener;
 import me.thosea.autopoller.listener.CommandListener;
 import me.thosea.autopoller.listener.PollEndListener;
+import me.thosea.autopoller.win.PollResults;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import org.apache.logging.log4j.LogManager;
@@ -40,8 +41,11 @@ public final class AutoPoller {
 	public final AutopollerConfig config;
 	public final JDA jda;
 	public final Guild guild;
+	public final PollResults pollResults;
 
 	private static AutoPoller instance;
+
+	private final Timer timer;
 
 	public AutoPoller(String version, AutopollerConfig config, JDA jda, Guild guild) {
 		if(instance != null) {
@@ -52,6 +56,8 @@ public final class AutoPoller {
 		this.config = config;
 		this.jda = jda;
 		this.guild = guild;
+		this.timer = new Timer("AutoPoller", /*isDaemon*/ true);
+		this.pollResults = new PollResults();
 		this.init();
 	}
 
@@ -62,6 +68,7 @@ public final class AutoPoller {
 		ApplicationLogs.init();
 		TrackedPolls.init();
 		scheduleSqlCleanup();
+		scheduleEarlyWin();
 
 		jda.addEventListener(
 				new CommandListener(),
@@ -92,15 +99,39 @@ public final class AutoPoller {
 			}
 		};
 
-		Timer timer = new Timer("SQL cleanup", true);
 		long delayPeriodMs = config.cooldownSeconds * 1000 + 1;
 		long pollPeriodMs = config.pollLengthHours * 60 * 60 * 1000 + 1;
 		// since polls have to be at least an hour long,
 		// the period will always be > 1h
 		long periodMs = Math.max(delayPeriodMs, pollPeriodMs);
 
-		timer.schedule(task, 0, periodMs);
+		this.timer.schedule(task, 0, periodMs);
 		LOGGER.info("SQL cleanup period: {} ms", periodMs);
+	}
+
+	private void scheduleEarlyWin() {
+		if(config.pollEarlyWinCheckInterval <= 0 || config.pollEarlyWinCount <= 0) {
+			LOGGER.info("Poll early win disabled");
+			return;
+		}
+
+		TimerTask task = new TimerTask() {
+			@Override
+			public void run() {
+				LOGGER.info("Checking for early poll wins");
+				Thread.startVirtualThread(() -> {
+					try {
+						pollResults.checkEarlyWins();
+					} catch(Exception e) {
+						LOGGER.error("Error checking for early poll wins", e);
+					}
+				});
+			}
+		};
+
+		long periodMs = config.pollEarlyWinCheckInterval * 60 * 1000;
+		this.timer.schedule(task, 0, periodMs);
+		LOGGER.info("Early win check cleanup: {} ms", periodMs);
 	}
 
 	public boolean isOurGuild(Guild guild) {

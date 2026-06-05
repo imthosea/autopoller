@@ -20,6 +20,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /*
  * Tracked polls
@@ -74,6 +77,10 @@ public final class TrackedPolls {
 		}
 	}
 
+	public static void dropEntry(TrackedPollEntry entry) {
+		dropEntry(entry.pollChannelId, entry.pollMessageId);
+	}
+
 	public static void dropEntry(long channelId, long messageId) {
 		try(SqlHelper sql = new SqlHelper()) {
 			sql.update("DELETE FROM TrackedPolls WHERE poll_channel = ? AND poll_message = ?", smt -> {
@@ -87,8 +94,7 @@ public final class TrackedPolls {
 
 	public static TrackedPollEntry getEntry(long channelId, long messageId) {
 		try(SqlHelper sql = new SqlHelper()) {
-			ResultSet result = sql.query("SELECT " +
-					"applicant_id,applicant_username,ticket_channel,thread_channel " +
+			ResultSet result = sql.query("SELECT * " +
 					"FROM TrackedPolls " +
 					"WHERE poll_channel = ? AND poll_message = ? " +
 					"AND (expire_at >= unixepoch())", smt -> {
@@ -100,6 +106,8 @@ public final class TrackedPolls {
 			}
 
 			return new TrackedPollEntry(
+					result.getLong("poll_channel"),
+					result.getLong("poll_message"),
 					result.getLong("applicant_id"),
 					result.getString("applicant_username"),
 					result.getLong("ticket_channel"),
@@ -110,6 +118,32 @@ public final class TrackedPolls {
 		}
 	}
 
-	public record TrackedPollEntry(long applicantId, String applicantUsername,
+	public static List<TrackedPollEntry> getEntries() {
+		try(SqlHelper sql = new SqlHelper()) {
+			List<TrackedPollEntry> entries = new ArrayList<>();
+
+			ResultSet result = sql.query("SELECT * FROM TrackedPolls WHERE (expire_at >= unixepoch())");
+			if(!result.next()) {
+				return Collections.emptyList();
+			}
+
+			do {
+				entries.add(new TrackedPollEntry(
+						result.getLong("poll_channel"),
+						result.getLong("poll_message"),
+						result.getLong("applicant_id"),
+						result.getString("applicant_username"),
+						result.getLong("ticket_channel"),
+						result.getLong("thread_channel")
+				));
+			} while(result.next());
+			return entries;
+		} catch(Exception e) {
+			throw new RuntimeException("Error listing tracked polls", e);
+		}
+	}
+
+	public record TrackedPollEntry(long pollChannelId, long pollMessageId,
+	                               long applicantId, String applicantUsername,
 	                               long ticketChannelId, long threadChannelId) {}
 }

@@ -43,6 +43,7 @@ public final class AutopollerMessages {
 	public final String makeAppSuccess;
 
 	public final String endPollWin;
+	public final String endPollEarlyWin;
 	public final String endPollLose;
 	public final String endPollAcknowledgeReactionEmoji;
 
@@ -108,6 +109,7 @@ public final class AutopollerMessages {
 		this.makeAppSuccess = str(prop, "msg.make_app.success");
 
 		this.endPollWin = str(prop, "msg.poll_end.win");
+		this.endPollEarlyWin = str(prop, "msg.poll_end.early_win");
 		this.endPollLose = str(prop, "msg.poll_end.lose");
 		this.endPollAcknowledgeReactionEmoji = str(prop, "msg.poll_end.acknowledge_reaction_emoji");
 
