@@ -15,27 +15,28 @@
  */
 package me.thosea.autopoller.util;
 
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.main.AutoPoller;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@Log4j2(topic = /*"Oh Crap"*/"AutoPollerErrors")
 public final class ErrorReporter {
 	private ErrorReporter() {}
 
+	private static final Logger LOGGER = LogManager.getLogger(/*Oh Crap*/ "AutoPollerErrors");
 	private static final String MSG = AutoPoller.instance().config.messages.error;
 
 	public static void error(User user, IReplyCallback event,
-	                         String task, Throwable e) {
-		LOGGER.error("Error processing {} for @{}", task, user.getName(), e);
+	                         String task, Throwable error) {
+		LOGGER.error("Error processing {} for @{}", task, user.getName(), error);
 		event.reply(MSG).setEphemeral(true).queue();
 	}
 
 	public static void deferredError(User user, InteractionHook hook,
-	                                 String task, Throwable e) {
-		LOGGER.error("Error processing deferred {} for @{}", task, user.getName(), e);
+	                                 String task, Throwable error) {
+		LOGGER.error("Error processing deferred {} for @{}", task, user.getName(), error);
 		hook.editOriginal(MSG).queue();
 	}
 }

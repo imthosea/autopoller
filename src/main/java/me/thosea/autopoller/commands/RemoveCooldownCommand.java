@@ -15,7 +15,6 @@
  */
 package me.thosea.autopoller.commands;
 
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.command.DeferredCommandHandler;
 import me.thosea.autopoller.data.UserDelays;
 import net.dv8tion.jda.api.Permission;
@@ -28,11 +27,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
-@Log4j2
 public final class RemoveCooldownCommand extends DeferredCommandHandler {
+	private static final Logger LOGGER = LogManager.getLogger(RemoveCooldownCommand.class);
+
 	public RemoveCooldownCommand() {
 		super(/*isEphemeral=*/ true, /*useVirtualThread=*/true);
 	}

@@ -17,10 +17,10 @@ package me.thosea.autopoller.data;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.config.AutopollerConfig;
 import me.thosea.autopoller.main.AutoPoller;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,9 +33,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author thosea<br>
  * this is like, the 5th project this class been copied to with slight modifications
  */
-@SuppressWarnings("resource")
-@Log4j2
+@SuppressWarnings({"resource", "unused"})
 public class SqlHelper implements AutoCloseable {
+	private static final Logger LOGGER = LogManager.getLogger(SqlHelper.class);
+
 	private static final HikariDataSource HIKARI;
 
 	private static final boolean DEBUG_ENABLED;
@@ -69,7 +70,7 @@ public class SqlHelper implements AutoCloseable {
 	protected Statement lastStatement;
 	protected ResultSet lastResult;
 
-	@Getter private boolean closed = false;
+	private boolean closed = false;
 
 	public SqlHelper() throws SQLException {
 		this.connection = HIKARI.getConnection();

@@ -15,7 +15,6 @@
  */
 package me.thosea.autopoller.main;
 
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.config.AutopollerConfig;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -24,15 +23,17 @@ import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import okhttp3.OkHttpClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-@Log4j2
 public final class Bootstrap {
+	private static final Logger LOGGER = LogManager.getLogger(Bootstrap.class);
+
 	public static void main(String[] args) {
 		String version;
 		AutopollerConfig config;
@@ -51,7 +52,7 @@ public final class Bootstrap {
 			throw new RuntimeException("Failed to read config", e);
 		}
 
-		Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+		java.util.logging.Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
 		// RestActionImpl.setDefaultFailure(error -> {}); // uncomment to hide exceptions
 
 		JDABuilder.createDefault(config.token)

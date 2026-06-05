@@ -15,7 +15,8 @@
  */
 package me.thosea.autopoller.data;
 
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,9 +24,10 @@ import java.sql.SQLException;
 /*
  * Tracked polls
  */
-@Log4j2
 public final class TrackedPolls {
 	private TrackedPolls() {}
+
+	private static final Logger LOGGER = LogManager.getLogger(TrackedPolls.class);
 
 	public static void init() {
 		try(SqlHelper sql = new SqlHelper()) {

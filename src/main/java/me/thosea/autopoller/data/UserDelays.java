@@ -15,19 +15,20 @@
  */
 package me.thosea.autopoller.data;
 
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.config.AutopollerConfig;
 import me.thosea.autopoller.main.AutoPoller;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.SQLException;
 
 /*
  * Holds application delays for users
  */
-@Log4j2
 public final class UserDelays {
 	private UserDelays() {}
 
+	private static final Logger LOGGER = LogManager.getLogger(UserDelays.class);
 	private static final AutopollerConfig CONFIG = AutoPoller.instance().config;
 
 	public static void init() {

@@ -3,7 +3,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCach
 plugins {
 	java
 	application
-	id("io.freefair.lombok") version "8.13.1"
 	id("com.gradleup.shadow") version "9.0.0-rc1"
 }
 

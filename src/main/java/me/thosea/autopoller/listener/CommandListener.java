@@ -15,7 +15,6 @@
  */
 package me.thosea.autopoller.listener;
 
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.command.CommandHandler;
 import me.thosea.autopoller.main.AutoPoller;
 import me.thosea.autopoller.util.ErrorReporter;
@@ -23,9 +22,11 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@Log4j2
 public final class CommandListener extends ListenerAdapter {
+	private static final Logger LOGGER = LogManager.getLogger(CommandListener.class);
 	private static final AutoPoller BOT = AutoPoller.instance();
 
 	@Override

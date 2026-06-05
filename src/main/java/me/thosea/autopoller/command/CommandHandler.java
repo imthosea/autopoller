@@ -15,7 +15,6 @@
  */
 package me.thosea.autopoller.command;
 
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.commands.AboutCommand;
 import me.thosea.autopoller.commands.ArchiveChannelCommand;
 import me.thosea.autopoller.commands.EndPollCommand;
@@ -30,13 +29,16 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Log4j2
 public abstract class CommandHandler {
+	private static final Logger LOGGER = LogManager.getLogger(CommandHandler.class);
+
 	protected abstract SlashCommandData makeCommandData();
 	public abstract void handle(Member member, User user, SlashCommandInteraction event);
 

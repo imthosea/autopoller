@@ -15,7 +15,6 @@
  */
 package me.thosea.autopoller.buttons;
 
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.button.DeferredButtonHandler;
 import me.thosea.autopoller.data.ApplicationLogs;
 import me.thosea.autopoller.data.TrackedPolls;
@@ -36,14 +35,17 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.api.utils.messages.MessagePollData;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.Color;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("DataFlowIssue")
-@Log4j2
 public final class MakeAppButton extends DeferredButtonHandler {
+	private static final Logger LOGGER = LogManager.getLogger(MakeAppButton.class);
+
 	private final Category category = BOT.getOrThrow("tickets category", () -> {
 		return BOT.guild.getCategoryById(BOT.config.ticketsCategoryId);
 	});

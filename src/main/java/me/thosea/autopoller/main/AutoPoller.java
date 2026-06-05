@@ -15,7 +15,6 @@
  */
 package me.thosea.autopoller.main;
 
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.command.CommandHandler;
 import me.thosea.autopoller.config.AutopollerConfig;
 import me.thosea.autopoller.data.ApplicationLogs;
@@ -26,14 +25,17 @@ import me.thosea.autopoller.listener.CommandListener;
 import me.thosea.autopoller.listener.PollEndListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Supplier;
 
-@Log4j2
 public final class AutoPoller {
+	private static final Logger LOGGER = LogManager.getLogger(AutoPoller.class);
+
 	public final String version;
 	public final AutopollerConfig config;
 	public final JDA jda;

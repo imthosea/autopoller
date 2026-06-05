@@ -15,7 +15,6 @@
  */
 package me.thosea.autopoller.commands;
 
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.command.DeferredCommandHandler;
 import me.thosea.autopoller.data.ApplicationLogs;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -29,11 +28,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.Color;
 
-@Log4j2
 public class ListApplicationsCommand extends DeferredCommandHandler {
+	private static final Logger LOGGER = LogManager.getLogger(ListApplicationsCommand.class);
+
 	private final Color embedColor = Color.decode(MSG.listAppsColor);
 
 	public ListApplicationsCommand() {

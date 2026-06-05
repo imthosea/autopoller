@@ -15,7 +15,6 @@
  */
 package me.thosea.autopoller.button;
 
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.buttons.MakeAppButton;
 import me.thosea.autopoller.config.AutopollerConfig;
 import me.thosea.autopoller.config.AutopollerMessages;
@@ -23,10 +22,11 @@ import me.thosea.autopoller.main.AutoPoller;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
-@Log4j2
 public abstract class ButtonHandler {
 	public abstract void handle(Member member, User user, ButtonInteraction event);
 
@@ -45,8 +45,9 @@ public abstract class ButtonHandler {
 			buttons = Map.of(ButtonIds.MAKE_APP, new MakeAppButton());
 			error = false;
 		} catch(Exception e) {
-			LOGGER.error("Failed to load a button handler, most likely due to a configuration error.", e);
-			LOGGER.error("All buttons will be disabled.");
+			Logger logger = LogManager.getLogger(ButtonHandler.class);
+			logger.error("Failed to load a button handler, most likely due to a configuration error.", e);
+			logger.error("All buttons will be disabled.");
 			buttons = null;
 			error = true;
 		}

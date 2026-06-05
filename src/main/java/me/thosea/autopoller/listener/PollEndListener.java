@@ -16,7 +16,6 @@
 
 package me.thosea.autopoller.listener;
 
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.config.AutopollerConfig;
 import me.thosea.autopoller.config.AutopollerMessages;
 import me.thosea.autopoller.data.TrackedPolls;
@@ -37,12 +36,14 @@ import net.dv8tion.jda.api.entities.messages.MessagePoll;
 import net.dv8tion.jda.api.entities.messages.MessagePoll.Answer;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Collections;
 import java.util.List;
 
-@Log4j2
 public final class PollEndListener extends ListenerAdapter {
+	private static final Logger LOGGER = LogManager.getLogger(PollEndListener.class);
 	private static final AutoPoller BOT = AutoPoller.instance();
 	private static final AutopollerConfig CONFIG = BOT.config;
 	private static final AutopollerMessages MSG = CONFIG.messages;

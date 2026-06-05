@@ -15,7 +15,6 @@
  */
 package me.thosea.autopoller.commands;
 
-import lombok.extern.log4j.Log4j2;
 import me.thosea.autopoller.button.ButtonIds;
 import me.thosea.autopoller.command.DeferredCommandHandler;
 import me.thosea.autopoller.util.ErrorReporter;
@@ -28,9 +27,12 @@ import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@Log4j2
 public final class SendApplicationMessageCommand extends DeferredCommandHandler {
+	private static final Logger LOGGER = LogManager.getLogger(SendApplicationMessageCommand.class);
+
 	public SendApplicationMessageCommand() {
 		super(/*isEphemeral=*/ true, /*useVirtualThread=*/false);
 	}
