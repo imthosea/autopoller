@@ -32,9 +32,11 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 public final class Bootstrap {
+	private Bootstrap() {}
+
 	private static final Logger LOGGER = LogManager.getLogger(Bootstrap.class);
 
-	public static void main(String[] args) {
+	static void main() {
 		String version;
 		AutopollerConfig config;
 
